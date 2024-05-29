@@ -31,16 +31,17 @@ def webhook():
             for messaging_event in entry['messaging']:
                 if messaging_event.get('message'):
                     sender_id = messaging_event['sender']['id']
-                    message_text = messaging_event['message']['text']
+                    message_text = messaging_event['message'].get('text')  # Use .get() to avoid KeyError
 
-                    # Store the user's message
-                    if sender_id not in user_conversations:
-                        user_conversations[sender_id] = [
-                            {"role": "system", "content": "You are an artificial intelligence that responds to users' messages on the Facebook Messenger application"}]
-                    user_conversations[sender_id].append({"role": "user", "content": message_text})
+                    if message_text:
+                        # Store the user's message
+                        if sender_id not in user_conversations:
+                            user_conversations[sender_id] = [
+                                {"role": "system", "content": "You are an artificial intelligence that responds to users' messages on the Facebook Messenger application"}]
+                        user_conversations[sender_id].append({"role": "user", "content": message_text})
 
-                    response = generate_gpt_response(sender_id)
-                    send_message(sender_id, response)
+                        response = generate_gpt_response(sender_id)
+                        send_message(sender_id, response)
     return 'ok', 200
 
 
